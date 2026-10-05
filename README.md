@@ -68,10 +68,10 @@ El menú principal incluye **Nueva partida**, **Continuar**, **Tutorial** y **Cr
 
 ## Tecnologías
 
-- **Motor:** Unity `[versión, ej. 2022.3 LTS]`
+- **Motor:** Unity
 - **Lenguaje:** C#
 - **Arte:** pixel art
-- **Plataforma:** móvil, orientación horizontal `[Android / iOS]`
+- **Plataforma:** móvil, orientación horizontal Android
 
 ---
 
@@ -80,7 +80,7 @@ El menú principal incluye **Nueva partida**, **Continuar**, **Tutorial** y **Cr
 - **Descargar el juego:** `[link a Releases o a itch.io]`
 - **Abrir el proyecto en Unity:**
   1. Instala Unity Hub y la versión indicada arriba.
-  2. Clona el repositorio: `git clone https://github.com/gescalonaw/[nombre-del-repo].git`
+  2. Clona el repositorio.
   3. En Unity Hub: *Add → Add project from disk* y selecciona la carpeta.
   4. Abre la escena `[Assets/Scenes/MainMenu]` y presiona *Play*.
 
