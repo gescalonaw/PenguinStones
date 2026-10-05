@@ -1,0 +1,61 @@
+using UnityEngine;
+using System.Collections.Generic;
+
+public class OrderManager : MonoBehaviour
+{
+    [Header("GameObjects de Clientes en Escena")]
+    public GameObject goOso;
+    public GameObject goZorro;
+    public GameObject goConejo;
+    public GameObject goGato;
+
+    private Dictionary<string, GameObject> customerObjects;
+
+    void Awake()
+    {
+        BuildMap();
+    }
+
+    void BuildMap()
+    {
+        customerObjects = new Dictionary<string, GameObject>
+        {
+            { "Oso",    goOso    },
+            { "Zorro",  goZorro  },
+            { "Conejo", goConejo },
+            { "Gato",   goGato   }
+        };
+
+        // Log para verificar que los slots están conectados
+        foreach (var entry in customerObjects)
+            Debug.Log($"BuildMap: {entry.Key} = {(entry.Value != null ? entry.Value.name : "NULL")}");
+    }
+
+    public void ShowCustomer(string name)
+    {
+        if (customerObjects == null) BuildMap();
+
+        foreach (var entry in customerObjects)
+        {
+            if (entry.Value != null)
+            {
+                bool show = entry.Key == name;
+                entry.Value.SetActive(show);
+                Debug.Log($"ShowCustomer: {entry.Key} -> {(show ? "VISIBLE" : "oculto")}");
+            }
+            else
+            {
+                Debug.LogWarning($"ShowCustomer: slot de {entry.Key} es NULL");
+            }
+        }
+    }
+
+    public void SetPlayerColor(string color) { GameManager.Instance.playerColor = color; }
+    public void SetPlayerShape(string shape) { GameManager.Instance.playerShape = shape; }
+
+    public bool CheckOrder()
+    {
+        return GameManager.Instance.playerColor == GameManager.Instance.requiredColor &&
+               GameManager.Instance.playerShape == GameManager.Instance.requiredShape;
+    }
+}

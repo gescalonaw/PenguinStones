@@ -1,0 +1,55 @@
+using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
+
+public class UIController : MonoBehaviour
+{
+    [Header("Textos UI")]
+    public TextMeshProUGUI moneyText;
+    public TextMeshProUGUI timerText;
+    public TextMeshProUGUI orderText;
+    public TextMeshProUGUI dayText;
+
+    [Header("Boton Taller")]
+    public Button goToWorkshopButton;
+
+    void Start()
+    {
+        if (goToWorkshopButton != null)
+            goToWorkshopButton.onClick.AddListener(GameManager.Instance.GoToWorkshop);
+
+        UpdateAll();
+    }
+
+    void Update()
+    {
+        if (timerText != null && GameManager.Instance != null)
+            timerText.text = Mathf.Ceil(GameManager.Instance.timeRemaining) + "s";
+    }
+
+    public void UpdateMoney()
+    {
+        if (moneyText != null && GameManager.Instance != null)
+            moneyText.text = "$" + GameManager.Instance.money;
+    }
+
+    public void UpdateOrder()
+    {
+        if (orderText != null && GameManager.Instance != null)
+            orderText.text = $"{GameManager.Instance.customerName} quiere:\n" +
+                             $"{GameManager.Instance.requiredColor} con {GameManager.Instance.requiredShape}";
+    }
+
+    public void UpdateDay()
+    {
+        if (dayText != null && GameManager.Instance != null)
+            dayText.text = "Dia " + GameManager.Instance.currentDay;
+    }
+
+    public void UpdateAll()
+    {
+        UpdateMoney();
+        UpdateOrder();
+        UpdateDay();
+    }
+}

@@ -1,0 +1,145 @@
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using System.Collections;
+
+public class GameManager : MonoBehaviour
+{
+    [Header("Estado del Juego")]
+    public int money = 1000;
+    public int currentDay = 1;
+
+    [Header("Timer")]
+    public float timeRemaining = 60f;
+    public bool timerRunning = false;
+
+    [Header("Pedido Actual")]
+    public string customerName;
+    public string requiredColor;
+    public string requiredShape;
+    public int currentReward = 100;
+    public string playerColor;
+    public string playerShape;
+
+    [Header("Datos posibles")]
+    public string[] customers = { "Oso", "Zorro", "Conejo", "Gato" };
+    public string[] colors    = { "rojo", "azul", "verde", "amarillo" };
+    public string[] shapes    = { "corazon", "estrella", "circulo" };
+
+    public static GameManager Instance;
+    private bool gameStarted = false;
+
+    void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+        SceneManager.sceneLoaded += OnSceneLoaded;
+    }
+
+    void OnDestroy()
+    {
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    // El timer corre siempre, en cualquier escena
+    void Update()
+    {
+        if (!timerRunning) return;
+        timeRemaining -= Time.deltaTime;
+        if (timeRemaining <= 0)
+        {
+            timeRemaining = 0;
+            timerRunning = false;
+            OnTimeEnded();
+        }
+    }
+
+    void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if (scene.name == "GameScene")
+            StartCoroutine(InitGameScene());
+    }
+
+    IEnumerator InitGameScene()
+    {
+        // Espera 2 frames para que Awake y Start de todos los objetos terminen
+        yield return null;
+        yield return null;
+
+        var om = FindFirstObjectByType<OrderManager>();
+        var ui = FindFirstObjectByType<UIController>();
+
+        if (!gameStarted)
+        {
+            // Primera vez que entra a GameScene
+            gameStarted = true;
+            GenerateOrder();
+            timerRunning = true;
+        }
+
+        // Siempre muestra el cliente actual y actualiza la UI
+        if (om != null)
+        {
+            om.ShowCustomer(customerName);
+            Debug.Log("Mostrando cliente: " + customerName);
+        }
+        else
+        {
+            Debug.LogWarning("OrderManager no encontrado en escena");
+        }
+
+        if (ui != null) ui.UpdateAll();
+    }
+
+    public void GenerateOrder()
+    {
+        customerName  = customers[Random.Range(0, customers.Length)];
+        requiredColor = colors[Random.Range(0, colors.Length)];
+        requiredShape = shapes[Random.Range(0, shapes.Length)];
+        currentReward = 100;
+        playerColor   = "";
+        playerShape   = "";
+        Debug.Log($"{customerName} quiere: {requiredColor} con {requiredShape}");
+    }
+
+    public void StartNewOrder()
+    {
+        GenerateOrder();
+        timeRemaining = 60f;
+        timerRunning  = true;
+
+        var om = FindFirstObjectByType<OrderManager>();
+        var ui = FindFirstObjectByType<UIController>();
+        if (om != null) om.ShowCustomer(customerName);
+        if (ui != null) ui.UpdateAll();
+    }
+
+    public void OnTimeEnded()
+    {
+        bool completed = playerColor == requiredColor && playerShape == requiredShape;
+        if (completed)
+        {
+            money += currentReward;
+            Debug.Log("Pedido completado! $" + money);
+        }
+        else
+        {
+            Debug.Log("Pedido fallido");
+        }
+        Invoke("StartNewOrder", 2f);
+    }
+
+    public void GoToWorkshop()
+    {
+        SceneManager.LoadScene("Workshop");
+    }
+
+    public void ReturnToShop()
+    {
+        SceneManager.LoadScene("GameScene");
+    }
+}
